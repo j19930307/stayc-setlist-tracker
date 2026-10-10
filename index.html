@@ -661,17 +661,30 @@
         renderSongsGrid(currentAlbumFilter, e.target.value);
       });
 
-      // 專輯標籤切換
+      // 專輯標籤切換 (支援反選取復原回全部專輯)
       const albumTabsContainer = document.getElementById('album-tabs');
       albumTabsContainer.addEventListener('click', (e) => {
         const btn = e.target.closest('.album-tab-btn');
         if (!btn) return;
 
+        const targetAlbumId = btn.dataset.albumId;
+
+        // 若點擊已選取的專輯且非 'all'，則反選取復原回 'all'
+        if (currentAlbumFilter === targetAlbumId && targetAlbumId !== 'all') {
+          currentAlbumFilter = 'all';
+        } else {
+          currentAlbumFilter = targetAlbumId;
+        }
+
+        // 更新標籤高亮樣式
         document.querySelectorAll('.album-tab-btn').forEach(b => {
-          b.className = 'album-tab-btn px-2.5 py-1 rounded-md bg-[#181628] text-gray-400 hover:text-white border border-gray-700/60 whitespace-nowrap transition-colors';
+          if (b.dataset.albumId === currentAlbumFilter) {
+            b.className = 'album-tab-btn px-2.5 py-1 rounded-md bg-stayc-pink text-white font-semibold whitespace-nowrap transition-colors shadow-sm shadow-pink-500/20';
+          } else {
+            b.className = 'album-tab-btn px-2.5 py-1 rounded-md bg-[#181628] text-gray-400 hover:text-white border border-gray-700/60 whitespace-nowrap transition-colors';
+          }
         });
-        btn.className = 'album-tab-btn px-2.5 py-1 rounded-md bg-stayc-pink text-white font-semibold whitespace-nowrap transition-colors';
-        currentAlbumFilter = btn.dataset.albumId;
+
         renderSongsGrid(currentAlbumFilter, searchInput.value);
       });
 
