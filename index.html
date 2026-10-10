@@ -36,17 +36,27 @@
       background-color: #0b0a12;
       color: #fffffe;
       -webkit-tap-highlight-color: transparent;
+      padding-bottom: env(safe-area-inset-bottom, 1rem);
     }
     .glow-text {
       text-shadow: 0 0 15px rgba(255, 75, 130, 0.45);
     }
     .btn-press:active {
-      transform: scale(0.97);
+      transform: scale(0.96);
     }
-    /* 自訂滾動條 */
+    /* 防止 iOS Safari 點擊輸入框時畫面強制放大 (Auto-zoom) */
+    @media (max-width: 768px) {
+      input, select, textarea {
+        font-size: 16px !important;
+      }
+    }
+    /* 自訂滾動條與平滑滑動 */
+    .overflow-x-auto, .overflow-y-auto {
+      -webkit-overflow-scrolling: touch;
+    }
     ::-webkit-scrollbar {
-      width: 6px;
-      height: 6px;
+      width: 5px;
+      height: 5px;
     }
     ::-webkit-scrollbar-track {
       background: #0f0e17;
@@ -109,9 +119,11 @@
       <!-- 1. 自訂輸入 -->
       <div>
         <label class="block text-xs font-bold uppercase tracking-wider text-stayc-neon mb-2">手動新增曲目 / 備註</label>
-        <form id="custom-form" class="flex gap-2">
-          <input type="text" id="custom-name" required class="flex-1 bg-[#12111d] border border-gray-700/60 rounded-xl px-3.5 py-2 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-stayc-pink" placeholder="輸入歌曲名稱（如：特別翻唱、未公開曲）">
-          <input type="text" id="custom-note" class="w-28 sm:w-44 bg-[#12111d] border border-gray-700/60 rounded-xl px-3 py-2 text-sm text-gray-300 placeholder-gray-500 focus:outline-none focus:border-stayc-pink" placeholder="備註 (選填)">
+        <form id="custom-form" class="flex flex-col sm:flex-row gap-2">
+          <div class="flex-1 flex gap-2">
+            <input type="text" id="custom-name" required class="flex-1 bg-[#12111d] border border-gray-700/60 rounded-xl px-3 py-2 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-stayc-pink" placeholder="輸入歌名（如：特別翻唱）">
+            <input type="text" id="custom-note" class="w-24 sm:w-40 bg-[#12111d] border border-gray-700/60 rounded-xl px-3 py-2 text-sm text-gray-300 placeholder-gray-500 focus:outline-none focus:border-stayc-pink" placeholder="備註">
+          </div>
           <button type="submit" class="btn-press bg-gradient-to-r from-stayc-pink to-stayc-purple text-white px-4 py-2 rounded-xl text-sm font-bold shadow-md shadow-pink-600/20 whitespace-nowrap">
             加入
           </button>
@@ -618,15 +630,15 @@
 
           <div class="flex items-center gap-1 shrink-0">
             <!-- 上移 -->
-            <button class="up-btn p-1 text-gray-400 hover:text-white rounded hover:bg-gray-800 ${index === 0 ? 'opacity-30 cursor-not-allowed' : ''}" data-index="${index}" title="上移">
+            <button class="up-btn btn-press w-7 h-7 sm:w-8 sm:h-8 flex items-center justify-center text-gray-400 hover:text-white rounded-lg bg-gray-800/40 hover:bg-gray-800 transition-colors ${index === 0 ? 'opacity-25 cursor-not-allowed pointer-events-none' : ''}" data-index="${index}" title="上移">
               <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"/></svg>
             </button>
             <!-- 下移 -->
-            <button class="down-btn p-1 text-gray-400 hover:text-white rounded hover:bg-gray-800 ${index === setlist.length - 1 ? 'opacity-30 cursor-not-allowed' : ''}" data-index="${index}" title="下移">
+            <button class="down-btn btn-press w-7 h-7 sm:w-8 sm:h-8 flex items-center justify-center text-gray-400 hover:text-white rounded-lg bg-gray-800/40 hover:bg-gray-800 transition-colors ${index === setlist.length - 1 ? 'opacity-25 cursor-not-allowed pointer-events-none' : ''}" data-index="${index}" title="下移">
               <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
             </button>
             <!-- 刪除 -->
-            <button class="del-btn p-1 text-gray-500 hover:text-red-400 rounded hover:bg-gray-800" data-index="${index}" title="刪除">
+            <button class="del-btn btn-press w-7 h-7 sm:w-8 sm:h-8 flex items-center justify-center text-gray-500 hover:text-red-400 rounded-lg bg-gray-800/40 hover:bg-red-950/60 transition-colors" data-index="${index}" title="刪除">
               <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
             </button>
           </div>
