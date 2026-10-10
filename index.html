@@ -373,6 +373,24 @@
           { name: "LIT", isTitle: true },
           { name: "MEOW", isTitle: true }
         ]
+      },
+      {
+        id: "fanconcert_solo",
+        short: "Fanconcert Solo",
+        name: "🎤 Fanconcert 成員 Solo / Cover 舞台",
+        year: "Solo Stages",
+        songs: [
+          { name: "Bo peep Bo peep (T-ARA cover - Isa solo)", isSolo: true },
+          { name: "Bubble Pop! (HyunA cover - Sumin solo)", isSolo: true },
+          { name: "I Really Like You (Carly Rae Jepsen cover - Sumin solo)", isSolo: true },
+          { name: "Dandelion (OOHYO cover - Seeun solo)", isSolo: true },
+          { name: "BIRDS OF A FEATHER (Billie Eilish cover - Seeun solo)", isSolo: true },
+          { name: "Mangrove tree (Younha cover - Yoon solo)", isSolo: true },
+          { name: "Mantra (JENNIE cover - J solo)", isSolo: true },
+          { name: "Levitating (Dua Lipa cover - J solo)", isSolo: true },
+          { name: "Greedy (Ariana Grande cover - Sieun solo)", isSolo: true },
+          { name: "toxic till the end (ROSÉ cover - Sieun solo)", isSolo: true }
+        ]
       }
     ];
 
@@ -502,6 +520,9 @@
           if (song.isTitle) {
             btnStyle = 'bg-pink-950/40 hover:bg-pink-900/60 border-pink-500/50 text-pink-200 font-semibold shadow-sm shadow-pink-500/10';
             badge = '<span class="text-[9px] px-1 py-0.2 rounded bg-pink-500 text-white font-bold ml-1">TITLE</span>';
+          } else if (song.isSolo) {
+            btnStyle = 'bg-rose-950/40 hover:bg-rose-900/60 border-rose-500/50 text-rose-200 font-medium shadow-sm shadow-rose-500/10';
+            badge = '<span class="text-[9px] px-1 py-0.2 rounded bg-rose-600 text-white font-bold ml-1">SOLO</span>';
           } else if (song.isUnit) {
             btnStyle = 'bg-purple-950/40 hover:bg-purple-900/60 border-purple-500/50 text-purple-200 font-medium';
             badge = '<span class="text-[9px] px-1 py-0.2 rounded bg-purple-600 text-white font-bold ml-1">UNIT</span>';
