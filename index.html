@@ -1,0 +1,586 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>STAYC Concert Setlist Tracker</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', '"Noto Sans TC"', 'sans-serif'],
+          },
+          colors: {
+            stayc: {
+              pink: '#ff4b82',
+              purple: '#8b5cf6',
+              neon: '#ff7eb6',
+              dark: '#0f0e17',
+              card: '#1a1829',
+              border: '#2e294e',
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    body {
+      background-color: #0b0a12;
+      color: #fffffe;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .glow-text {
+      text-shadow: 0 0 15px rgba(255, 75, 130, 0.45);
+    }
+    .btn-press:active {
+      transform: scale(0.97);
+    }
+    /* 自訂滾動條 */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #0f0e17;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #2e294e;
+      border-radius: 9999px;
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col font-sans selection:bg-pink-500 selection:text-white">
+
+  <!-- Header -->
+  <header class="sticky top-0 z-40 bg-[#0f0e17]/90 backdrop-blur-md border-b border-stayc-border px-4 py-3">
+    <div class="max-w-4xl mx-auto flex items-center justify-between">
+      <div class="flex items-center gap-2">
+        <span class="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-gradient-to-tr from-stayc-pink to-stayc-purple text-white font-black text-sm shadow-lg shadow-pink-500/20">
+          ST
+        </span>
+        <div>
+          <h1 class="text-base font-bold tracking-tight glow-text flex items-center gap-1.5 text-white">
+            STAYC <span class="text-stayc-neon text-xs font-semibold px-1.5 py-0.5 rounded bg-pink-950/60 border border-pink-500/30">Setlist</span>
+          </h1>
+          <p class="text-[11px] text-gray-400">演唱會歌單即時筆記</p>
+        </div>
+      </div>
+      
+      <div class="flex items-center gap-2">
+        <button id="copy-btn" class="btn-press text-xs font-semibold px-3 py-1.5 rounded-lg bg-stayc-pink hover:bg-pink-600 text-white flex items-center gap-1.5 shadow-md shadow-pink-600/30 transition-all">
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"/></svg>
+          複製歌單
+        </button>
+        <button id="clear-btn" class="btn-press text-xs font-medium px-2.5 py-1.5 rounded-lg bg-gray-800/80 hover:bg-red-950 text-gray-300 hover:text-red-300 border border-gray-700/60 transition-all">
+          清空
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- 主內容區 -->
+  <main class="flex-1 max-w-4xl w-full mx-auto p-4 space-y-5 pb-16">
+    
+    <!-- 演唱會基本資訊 (可編輯) -->
+    <div class="bg-stayc-card/90 rounded-2xl p-4 border border-stayc-border shadow-lg">
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
+        <div>
+          <label class="block text-xs font-medium text-gray-400 mb-1">演出名稱</label>
+          <input type="text" id="concert-title" class="w-full bg-[#12111d] border border-gray-700/60 rounded-lg px-3 py-1.5 text-sm font-semibold text-white focus:outline-none focus:border-stayc-neon transition-colors" placeholder="STAYC Concert Tour">
+        </div>
+        <div>
+          <label class="block text-xs font-medium text-gray-400 mb-1">日期與地點</label>
+          <input type="text" id="concert-meta" class="w-full bg-[#12111d] border border-gray-700/60 rounded-lg px-3 py-1.5 text-sm text-gray-300 focus:outline-none focus:border-stayc-neon transition-colors" placeholder="2026.10.11 @ Arena">
+        </div>
+      </div>
+    </div>
+
+    <!-- 快速操作區：自訂輸入 + 流程標籤 + 歷代歌曲庫 -->
+    <div class="bg-stayc-card/90 rounded-2xl p-4 border border-stayc-border shadow-lg space-y-4">
+      
+      <!-- 1. 自訂輸入 -->
+      <div>
+        <label class="block text-xs font-bold uppercase tracking-wider text-stayc-neon mb-2">手動新增曲目 / 備註</label>
+        <form id="custom-form" class="flex gap-2">
+          <input type="text" id="custom-name" required class="flex-1 bg-[#12111d] border border-gray-700/60 rounded-xl px-3.5 py-2 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-stayc-pink" placeholder="輸入歌曲名稱（如：特別翻唱、未公開曲）">
+          <input type="text" id="custom-note" class="w-28 sm:w-44 bg-[#12111d] border border-gray-700/60 rounded-xl px-3 py-2 text-sm text-gray-300 placeholder-gray-500 focus:outline-none focus:border-stayc-pink" placeholder="備註 (選填)">
+          <button type="submit" class="btn-press bg-gradient-to-r from-stayc-pink to-stayc-purple text-white px-4 py-2 rounded-xl text-sm font-bold shadow-md shadow-pink-600/20 whitespace-nowrap">
+            加入
+          </button>
+        </form>
+      </div>
+
+      <!-- 2. 演唱會環節標籤 (一鍵插入) -->
+      <div>
+        <label class="block text-xs font-bold uppercase tracking-wider text-stayc-neon mb-2">演唱會環節 (快速插入)</label>
+        <div class="flex flex-wrap gap-1.5">
+          <button type="button" class="tag-btn btn-press text-xs font-medium px-3 py-1.5 rounded-lg bg-purple-950/50 hover:bg-purple-900/80 border border-purple-500/30 text-purple-200" data-type="event" data-title="🎬 VCR">
+            🎬 VCR
+          </button>
+          <button type="button" class="tag-btn btn-press text-xs font-medium px-3 py-1.5 rounded-lg bg-sky-950/50 hover:bg-sky-900/80 border border-sky-500/30 text-sky-200" data-type="event" data-title="💬 Ment (打招呼 / 講話)">
+            💬 Ment (談話)
+          </button>
+          <button type="button" class="tag-btn btn-press text-xs font-medium px-3 py-1.5 rounded-lg bg-pink-950/50 hover:bg-pink-900/80 border border-pink-500/30 text-pink-200" data-type="event" data-title="✨ Encore (安可)">
+            ✨ Encore
+          </button>
+          <button type="button" class="tag-btn btn-press text-xs font-medium px-3 py-1.5 rounded-lg bg-amber-950/50 hover:bg-amber-900/80 border border-amber-500/30 text-amber-200" data-type="event" data-title="📸 拍照時間 (Photo Time)">
+            📸 拍照時間
+          </button>
+          <button type="button" class="tag-btn btn-press text-xs font-medium px-3 py-1.5 rounded-lg bg-fuchsia-950/50 hover:bg-fuchsia-900/80 border border-fuchsia-500/30 text-fuchsia-200" data-type="event" data-title="🎀 Double Encore (二次安可)">
+            🎀 二次安可
+          </button>
+        </div>
+      </div>
+
+      <!-- 3. STAYC 歌曲快選庫 -->
+      <div>
+        <div class="flex items-center justify-between mb-2">
+          <label class="text-xs font-bold uppercase tracking-wider text-stayc-neon">STAYC 歌曲快捷鍵 (點選即加入)</label>
+          <input type="text" id="song-filter" class="text-xs bg-[#12111d] border border-gray-700/60 rounded-md px-2.5 py-1 text-gray-300 placeholder-gray-500 focus:outline-none focus:border-stayc-pink" placeholder="搜尋曲名...">
+        </div>
+        
+        <!-- 分類標籤 -->
+        <div class="flex gap-1.5 mb-2.5 text-[11px] overflow-x-auto pb-1">
+          <button type="button" class="filter-tab px-2.5 py-1 rounded-md bg-stayc-pink text-white font-semibold" data-category="all">全部</button>
+          <button type="button" class="filter-tab px-2.5 py-1 rounded-md bg-gray-800 text-gray-400 hover:text-white" data-category="title">歷代主打</button>
+          <button type="button" class="filter-tab px-2.5 py-1 rounded-md bg-gray-800 text-gray-400 hover:text-white" data-category="bside">人氣收錄曲</button>
+          <button type="button" class="filter-tab px-2.5 py-1 rounded-md bg-gray-800 text-gray-400 hover:text-white" data-category="jp">日單 / 翻唱</button>
+        </div>
+
+        <div id="songs-grid" class="flex flex-wrap gap-1.5 max-h-48 overflow-y-auto pr-1">
+          <!-- 由 JS 自動渲染歌曲清單 -->
+        </div>
+      </div>
+
+    </div>
+
+    <!-- 歌單記錄列表 -->
+    <div class="bg-stayc-card/90 rounded-2xl p-4 border border-stayc-border shadow-lg">
+      <div class="flex items-center justify-between pb-3 mb-3 border-b border-stayc-border">
+        <div>
+          <h2 class="text-sm font-bold text-white flex items-center gap-2">
+            <span>當前歌單</span>
+            <span id="setlist-count" class="text-xs font-semibold px-2 py-0.5 rounded-full bg-stayc-pink/20 text-stayc-neon border border-stayc-pink/30">
+              0 首
+            </span>
+          </h2>
+        </div>
+        <div class="text-xs text-gray-400">
+          可調整上下順序與備註
+        </div>
+      </div>
+
+      <!-- 空狀態 -->
+      <div id="empty-state" class="text-center py-12 text-gray-500 text-sm">
+        <div class="text-3xl mb-2">🎶</div>
+        點選上方歌曲或自訂新增，開始紀錄今晚的歌單！
+      </div>
+
+      <!-- 列表容器 -->
+      <ul id="setlist-items" class="space-y-2">
+        <!-- 由 JS 動態注入 -->
+      </ul>
+    </div>
+
+  </main>
+
+  <!-- 複製成功的 Toast 提示 -->
+  <div id="toast" class="fixed bottom-6 left-1/2 -translate-x-1/2 bg-gradient-to-r from-stayc-pink to-stayc-purple text-white text-xs font-bold px-4 py-2.5 rounded-full shadow-xl shadow-pink-500/30 transition-all opacity-0 pointer-events-none translate-y-3 duration-300 z-50 flex items-center gap-1.5">
+    <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+    <span id="toast-msg">已成功複製歌單！</span>
+  </div>
+
+  <script>
+    // STAYC 歌曲資料庫
+    const STAYC_SONGS = [
+      // 主打歌 (Title Tracks)
+      { name: "SO BAD", category: "title" },
+      { name: "ASAP", category: "title" },
+      { name: "STEREOTYPE (색안경)", category: "title" },
+      { name: "RUN2U", category: "title" },
+      { name: "BEAUTIFUL MONSTER", category: "title" },
+      { name: "Teddy Bear", category: "title" },
+      { name: "Bubble", category: "title" },
+      { name: "Cheeky Icy Thang", category: "title" },
+      { name: "Poppy (Korean Ver.)", category: "title" },
+      { name: "LIT (Korean Ver.)", category: "title" },
+
+      // 熱門收錄曲 (B-sides)
+      { name: "LIKE THIS", category: "bside" },
+      { name: "SO WHAT", category: "bside" },
+      { name: "LOVE FOOL (사랑은 원래 이렇게 아픈 건가요)", category: "bside" },
+      { name: "COMPLEX", category: "bside" },
+      { name: "I'LL BE THERE", category: "bside" },
+      { name: "SLOW DOWN", category: "bside" },
+      { name: "YOUNG LUV", category: "bside" },
+      { name: "SAME SAME", category: "bside" },
+      { name: "247", category: "bside" },
+      { name: "BUTTERFLY", category: "bside" },
+      { name: "I WANT U BABY", category: "bside" },
+      { name: "LOVE", category: "bside" },
+      { name: "Not Like You", category: "bside" },
+      { name: "Be Mine", category: "bside" },
+      { name: "1 Thing", category: "bside" },
+      { name: "Give It 2 Me", category: "bside" },
+      { name: "Find", category: "bside" },
+      { name: "Roses", category: "bside" },
+      { name: "Stay WITH me", category: "bside" },
+      { name: "Flexing On My Ex", category: "bside" },
+      { name: "Trouble Maker", category: "bside" },
+      { name: "Gummy Bear", category: "bside" },
+
+      // 日文曲 / 其他
+      { name: "Poppy (Japanese Ver.)", category: "jp" },
+      { name: "LIT (Japanese Ver.)", category: "jp" },
+      { name: "MEOW", category: "jp" }
+    ];
+
+    // 狀態管理
+    let setlist = [];
+    const STORAGE_KEY = 'stayc_setlist_data';
+    const META_KEY = 'stayc_concert_meta';
+
+    // 初始化載入
+    window.addEventListener('DOMContentLoaded', () => {
+      loadMeta();
+      loadSetlist();
+      renderSongsGrid('all', '');
+      setupEventListeners();
+    });
+
+    // 載入演唱會資訊
+    function loadMeta() {
+      const meta = JSON.parse(localStorage.getItem(META_KEY) || '{}');
+      document.getElementById('concert-title').value = meta.title || 'STAYC CONCERT TOUR';
+      document.getElementById('concert-meta').value = meta.meta || '2026.10.11 @ Live Stage';
+    }
+
+    function saveMeta() {
+      const data = {
+        title: document.getElementById('concert-title').value,
+        meta: document.getElementById('concert-meta').value,
+      };
+      localStorage.setItem(META_KEY, JSON.stringify(data));
+    }
+
+    // 載入歌單
+    function loadSetlist() {
+      try {
+        const stored = localStorage.getItem(STORAGE_KEY);
+        if (stored) {
+          setlist = JSON.parse(stored);
+        }
+      } catch (e) {
+        console.error(e);
+        setlist = [];
+      }
+      renderSetlist();
+    }
+
+    // 儲存歌單
+    function saveSetlist() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(setlist));
+      renderSetlist();
+    }
+
+    // 渲染歌曲按鈕庫
+    function renderSongsGrid(category, query) {
+      const container = document.getElementById('songs-grid');
+      container.innerHTML = '';
+
+      const filtered = STAYC_SONGS.filter(song => {
+        const matchesCategory = category === 'all' || song.category === category;
+        const matchesQuery = song.name.toLowerCase().includes(query.toLowerCase());
+        return matchesCategory && matchesQuery;
+      });
+
+      if (filtered.length === 0) {
+        container.innerHTML = '<span class="text-xs text-gray-500 py-2">找不到相符歌曲</span>';
+        return;
+      }
+
+      filtered.forEach(song => {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = `btn-press text-xs px-2.5 py-1.5 rounded-lg border transition-all text-left ${
+          song.category === 'title' 
+            ? 'bg-pink-950/40 hover:bg-pink-900/60 border-pink-500/40 text-pink-200 font-semibold' 
+            : song.category === 'jp'
+            ? 'bg-amber-950/30 hover:bg-amber-900/50 border-amber-500/30 text-amber-200'
+            : 'bg-[#181628] hover:bg-[#25223c] border-gray-700/60 text-gray-200'
+        }`;
+        btn.textContent = song.name;
+        btn.addEventListener('click', () => {
+          addItem({
+            type: 'song',
+            title: song.name,
+            note: ''
+          });
+        });
+        container.appendChild(btn);
+      });
+    }
+
+    // 新增項目 (無時間戳記)
+    function addItem(item) {
+      setlist.push({
+        id: Date.now() + Math.random().toString(36).substr(2, 4),
+        type: item.type, // 'song' | 'event'
+        title: item.title,
+        note: item.note || ''
+      });
+      saveSetlist();
+      showToast(`已新增：${item.title}`);
+    }
+
+    // 渲染當前歌單清單
+    function renderSetlist() {
+      const listEl = document.getElementById('setlist-items');
+      const emptyEl = document.getElementById('empty-state');
+      const countEl = document.getElementById('setlist-count');
+
+      // 計算歌曲數量 (排除純環節標籤)
+      const songCount = setlist.filter(item => item.type === 'song').length;
+      countEl.textContent = `${songCount} 首曲目 (總計 ${setlist.length} 項)`;
+
+      if (setlist.length === 0) {
+        emptyEl.classList.remove('hidden');
+        listEl.innerHTML = '';
+        return;
+      }
+
+      emptyEl.classList.add('hidden');
+      listEl.innerHTML = '';
+
+      let songIndex = 1;
+
+      setlist.forEach((item, index) => {
+        const isEvent = item.type === 'event';
+        const li = document.createElement('li');
+        li.className = `p-3 rounded-xl border transition-all flex items-center justify-between gap-3 ${
+          isEvent 
+            ? 'bg-purple-950/20 border-purple-500/30 text-purple-200' 
+            : 'bg-[#151324] border-gray-800/80 hover:border-stayc-pink/30'
+        }`;
+
+        // 序號或標記
+        let prefix = '';
+        if (isEvent) {
+          prefix = `<span class="text-xs px-2 py-0.5 rounded bg-purple-900/50 border border-purple-500/30 text-purple-300 font-semibold">環節</span>`;
+        } else {
+          prefix = `<span class="w-6 text-center text-xs font-bold text-stayc-neon">${songIndex++}</span>`;
+        }
+
+        li.innerHTML = `
+          <div class="flex items-center gap-2.5 flex-1 min-w-0">
+            ${prefix}
+            <div class="min-w-0 flex-1">
+              <div class="text-sm font-semibold text-white truncate">${item.title}</div>
+              <input type="text" data-id="${item.id}" class="note-input mt-1 w-full text-xs bg-transparent border-b border-transparent hover:border-gray-700 focus:border-stayc-pink text-gray-400 focus:text-gray-200 focus:outline-none transition-colors" placeholder="點此新增備註 (例如：換服裝、高音發揮...)" value="${escapeHtml(item.note)}">
+            </div>
+          </div>
+
+          <div class="flex items-center gap-1 shrink-0">
+            <!-- 上移 -->
+            <button class="up-btn p-1 text-gray-400 hover:text-white rounded hover:bg-gray-800 ${index === 0 ? 'opacity-30 cursor-not-allowed' : ''}" data-index="${index}" title="上移">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"/></svg>
+            </button>
+            <!-- 下移 -->
+            <button class="down-btn p-1 text-gray-400 hover:text-white rounded hover:bg-gray-800 ${index === setlist.length - 1 ? 'opacity-30 cursor-not-allowed' : ''}" data-index="${index}" title="下移">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+            </button>
+            <!-- 刪除 -->
+            <button class="del-btn p-1 text-gray-500 hover:text-red-400 rounded hover:bg-gray-800" data-index="${index}" title="刪除">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+            </button>
+          </div>
+        `;
+        listEl.appendChild(li);
+      });
+    }
+
+    // 轉義 HTML 防止 XSS
+    function escapeHtml(text) {
+      if (!text) return '';
+      return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+    }
+
+    // 設定事件監聽器
+    function setupEventListeners() {
+      // 演唱會資訊儲存
+      document.getElementById('concert-title').addEventListener('input', saveMeta);
+      document.getElementById('concert-meta').addEventListener('input', saveMeta);
+
+      // 自訂表單提交
+      document.getElementById('custom-form').addEventListener('submit', (e) => {
+        e.preventDefault();
+        const nameInput = document.getElementById('custom-name');
+        const noteInput = document.getElementById('custom-note');
+        const title = nameInput.value.trim();
+        const note = noteInput.value.trim();
+        if (title) {
+          addItem({
+            type: 'song',
+            title: title,
+            note: note
+          });
+          nameInput.value = '';
+          noteInput.value = '';
+        }
+      });
+
+      // 快速流程標籤點擊
+      document.querySelectorAll('.tag-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          addItem({
+            type: btn.dataset.type,
+            title: btn.dataset.title,
+            note: ''
+          });
+        });
+      });
+
+      // 搜尋曲庫
+      let currentCategory = 'all';
+      const searchInput = document.getElementById('song-filter');
+      searchInput.addEventListener('input', (e) => {
+        renderSongsGrid(currentCategory, e.target.value);
+      });
+
+      // 分類標籤切換
+      document.querySelectorAll('.filter-tab').forEach(tab => {
+        tab.addEventListener('click', () => {
+          document.querySelectorAll('.filter-tab').forEach(t => {
+            t.className = 'filter-tab px-2.5 py-1 rounded-md bg-gray-800 text-gray-400 hover:text-white';
+          });
+          tab.className = 'filter-tab px-2.5 py-1 rounded-md bg-stayc-pink text-white font-semibold';
+          currentCategory = tab.dataset.category;
+          renderSongsGrid(currentCategory, searchInput.value);
+        });
+      });
+
+      // 列表委派事件 (排序 / 刪除 / 編輯備註)
+      const listEl = document.getElementById('setlist-items');
+      listEl.addEventListener('click', (e) => {
+        const upBtn = e.target.closest('.up-btn');
+        const downBtn = e.target.closest('.down-btn');
+        const delBtn = e.target.closest('.del-btn');
+
+        if (upBtn) {
+          const idx = parseInt(upBtn.dataset.index);
+          if (idx > 0) {
+            const temp = setlist[idx];
+            setlist[idx] = setlist[idx - 1];
+            setlist[idx - 1] = temp;
+            saveSetlist();
+          }
+        } else if (downBtn) {
+          const idx = parseInt(downBtn.dataset.index);
+          if (idx < setlist.length - 1) {
+            const temp = setlist[idx];
+            setlist[idx] = setlist[idx + 1];
+            setlist[idx + 1] = temp;
+            saveSetlist();
+          }
+        } else if (delBtn) {
+          const idx = parseInt(delBtn.dataset.index);
+          const removed = setlist.splice(idx, 1);
+          saveSetlist();
+          if (removed.length > 0) {
+            showToast(`已移除：${removed[0].title}`);
+          }
+        }
+      });
+
+      // 備註輸入失焦或更動時存檔
+      listEl.addEventListener('change', (e) => {
+        if (e.target.classList.contains('note-input')) {
+          const id = e.target.dataset.id;
+          const item = setlist.find(i => i.id === id);
+          if (item) {
+            item.note = e.target.value.trim();
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(setlist));
+          }
+        }
+      });
+
+      // 清空歌單
+      document.getElementById('clear-btn').addEventListener('click', () => {
+        if (setlist.length === 0) return;
+        if (confirm('確定要清空歌單嗎？')) {
+          setlist = [];
+          saveSetlist();
+          showToast('歌單已清空');
+        }
+      });
+
+      // 複製排版好的歌單至剪貼簿
+      document.getElementById('copy-btn').addEventListener('click', copyFormattedSetlist);
+    }
+
+    // 產生適合發社群 (Threads / X / IG) 的純文字歌單
+    function copyFormattedSetlist() {
+      if (setlist.length === 0) {
+        showToast('目前歌單是空的，無法複製！');
+        return;
+      }
+
+      const title = document.getElementById('concert-title').value.trim() || 'STAYC CONCERT SETLIST';
+      const meta = document.getElementById('concert-meta').value.trim();
+
+      let text = `💖 ${title} 💖\n`;
+      if (meta) {
+        text += `📍 ${meta}\n`;
+      }
+      text += `──────────────\n`;
+
+      let songNo = 1;
+      setlist.forEach(item => {
+        if (item.type === 'event') {
+          text += `\n[ ${item.title} ]\n`;
+        } else {
+          text += `${String(songNo++).padStart(2, '0')}. ${item.title}`;
+          if (item.note) {
+            text += ` (${item.note})`;
+          }
+          text += `\n`;
+        }
+      });
+
+      text += `──────────────\n`;
+      text += `#STAYC #스테이씨 #STAYC_SETLIST`;
+
+      navigator.clipboard.writeText(text).then(() => {
+        showToast('已複製好社群排版歌單！📋');
+      }).catch(err => {
+        console.error(err);
+        showToast('複製失敗，請手動複製');
+      });
+    }
+
+    // 顯示提示浮窗
+    let toastTimeout;
+    function showToast(message) {
+      const toast = document.getElementById('toast');
+      const msg = document.getElementById('toast-msg');
+      msg.textContent = message;
+      toast.classList.remove('opacity-0', 'pointer-events-none', 'translate-y-3');
+      toast.classList.add('opacity-100', 'translate-y-0');
+
+      clearTimeout(toastTimeout);
+      toastTimeout = setTimeout(() => {
+        toast.classList.remove('opacity-100', 'translate-y-0');
+        toast.classList.add('opacity-0', 'pointer-events-none', 'translate-y-3');
+      }, 2000);
+    }
+  </script>
+</body>
+</html>
