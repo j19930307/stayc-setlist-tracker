@@ -151,7 +151,9 @@
         <div class="flex gap-1.5 mb-2.5 text-[11px] overflow-x-auto pb-1">
           <button type="button" class="filter-tab px-2.5 py-1 rounded-md bg-stayc-pink text-white font-semibold" data-category="all">全部</button>
           <button type="button" class="filter-tab px-2.5 py-1 rounded-md bg-gray-800 text-gray-400 hover:text-white" data-category="title">歷代主打</button>
-          <button type="button" class="filter-tab px-2.5 py-1 rounded-md bg-gray-800 text-gray-400 hover:text-white" data-category="bside">人氣收錄曲</button>
+          <button type="button" class="filter-tab px-2.5 py-1 rounded-md bg-gray-800 text-gray-400 hover:text-white" data-category="album">正規一輯/新曲</button>
+          <button type="button" class="filter-tab px-2.5 py-1 rounded-md bg-gray-800 text-gray-400 hover:text-white" data-category="unit">小分隊 / Solo</button>
+          <button type="button" class="filter-tab px-2.5 py-1 rounded-md bg-gray-800 text-gray-400 hover:text-white" data-category="bside">經典收錄曲</button>
           <button type="button" class="filter-tab px-2.5 py-1 rounded-md bg-gray-800 text-gray-400 hover:text-white" data-category="jp">日單 / 翻唱</button>
         </div>
 
@@ -199,9 +201,9 @@
   </div>
 
   <script>
-    // STAYC 歌曲資料庫
+    // STAYC 歌曲資料庫 (全面收錄歷代主打、正規一輯、小分隊、收錄曲)
     const STAYC_SONGS = [
-      // 主打歌 (Title Tracks)
+      // 1. 歷代主打歌 (Title Tracks)
       { name: "SO BAD", category: "title" },
       { name: "ASAP", category: "title" },
       { name: "STEREOTYPE (색안경)", category: "title" },
@@ -213,7 +215,44 @@
       { name: "Poppy (Korean Ver.)", category: "title" },
       { name: "LIT (Korean Ver.)", category: "title" },
 
-      // 熱門收錄曲 (B-sides)
+      // 2. 小分隊 / Solo 曲目 (Unit & Solo)
+      { name: "Find (Sieun & Seeun & J)", category: "unit" },
+      { name: "Fakin’ ( Sumin & Yoon )", category: "unit" },
+      { name: "Roses ( ISA )", category: "unit" },
+      { name: "Over U, 안녕 (Seeun x J)", category: "unit" },
+
+      // 3. 正規一輯《Metamorphic》及最新曲目
+      { name: "Twenty", category: "album" },
+      { name: "1 Thing", category: "album" },
+      { name: "Give It 2 Me", category: "album" },
+      { name: "Let Me Know", category: "album" },
+      { name: "Nada", category: "album" },
+      { name: "Beauty Bomb", category: "album" },
+      { name: "Gummy Bear", category: "album" },
+      { name: "Stay WITH me", category: "album" },
+      { name: "Flexing On My Ex", category: "album" },
+      { name: "Trouble Maker", category: "album" },
+      { name: "GPT", category: "album" },
+      { name: "너란 별을 만나 (Meant To Be)", category: "album" },
+      { name: "Tell Me Now", category: "album" },
+      { name: "BEBE", category: "album" },
+      { name: "DIAMOND", category: "album" },
+      { name: "PIPE DOWN", category: "album" },
+      { name: "Lover, Killer", category: "album" },
+      { name: "I WANT IT", category: "album" },
+      { name: "BOY", category: "album" },
+      { name: "반칙(Honestly)", category: "album" },
+      { name: "MWUAH", category: "album" },
+      { name: "Satellite", category: "album" },
+      { name: "Say My Name", category: "album" },
+      { name: "2 L0VE", category: "album" },
+      { name: "WHERE YOU AT?", category: "album" },
+      { name: "SORRY", category: "album" },
+      { name: "BEAT MY LOVE", category: "album" },
+      { name: "I LIKE IT", category: "album" },
+      { name: "I Wanna Do", category: "album" },
+
+      // 4. 經典人氣收錄曲 (B-sides)
       { name: "LIKE THIS", category: "bside" },
       { name: "SO WHAT", category: "bside" },
       { name: "LOVE FOOL (사랑은 원래 이렇게 아픈 건가요)", category: "bside" },
@@ -228,16 +267,8 @@
       { name: "LOVE", category: "bside" },
       { name: "Not Like You", category: "bside" },
       { name: "Be Mine", category: "bside" },
-      { name: "1 Thing", category: "bside" },
-      { name: "Give It 2 Me", category: "bside" },
-      { name: "Find", category: "bside" },
-      { name: "Roses", category: "bside" },
-      { name: "Stay WITH me", category: "bside" },
-      { name: "Flexing On My Ex", category: "bside" },
-      { name: "Trouble Maker", category: "bside" },
-      { name: "Gummy Bear", category: "bside" },
 
-      // 日文曲 / 其他
+      // 5. 日文曲 / 其他 (Japanese & Special)
       { name: "Poppy (Japanese Ver.)", category: "jp" },
       { name: "LIT (Japanese Ver.)", category: "jp" },
       { name: "MEOW", category: "jp" }
@@ -313,9 +344,14 @@
         btn.className = `btn-press text-xs px-2.5 py-1.5 rounded-lg border transition-all text-left ${
           song.category === 'title' 
             ? 'bg-pink-950/40 hover:bg-pink-900/60 border-pink-500/40 text-pink-200 font-semibold' 
+            : song.category === 'unit'
+            ? 'bg-purple-950/50 hover:bg-purple-900/70 border-purple-500/40 text-purple-200 font-medium'
+            : song.category === 'album'
+            ? 'bg-indigo-950/40 hover:bg-indigo-900/60 border-indigo-500/40 text-indigo-200'
             : song.category === 'jp'
             ? 'bg-amber-950/30 hover:bg-amber-900/50 border-amber-500/30 text-amber-200'
             : 'bg-[#181628] hover:bg-[#25223c] border-gray-700/60 text-gray-200'
+        }`;
         }`;
         btn.textContent = song.name;
         btn.addEventListener('click', () => {
