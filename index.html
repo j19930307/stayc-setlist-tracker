@@ -539,6 +539,13 @@
       });
       saveSetlist();
       showToast(`已新增：${item.title}`);
+
+      // 若搜尋框有輸入文字，加入歌單後自動清空並還原完整歌曲庫
+      const searchInput = document.getElementById('song-filter');
+      if (searchInput && searchInput.value.trim() !== '') {
+        searchInput.value = '';
+        renderSongsGrid(currentAlbumFilter, '');
+      }
     }
 
     // 渲染當前歌單清單
