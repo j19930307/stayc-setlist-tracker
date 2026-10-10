@@ -140,25 +140,24 @@
         </div>
       </div>
 
-      <!-- 3. STAYC 歌曲快選庫 -->
+      <!-- 3. STAYC 歌曲快選庫 (依專輯分類) -->
       <div>
         <div class="flex items-center justify-between mb-2">
-          <label class="text-xs font-bold uppercase tracking-wider text-stayc-neon">STAYC 歌曲快捷鍵 (點選即加入)</label>
-          <input type="text" id="song-filter" class="text-xs bg-[#12111d] border border-gray-700/60 rounded-md px-2.5 py-1 text-gray-300 placeholder-gray-500 focus:outline-none focus:border-stayc-pink" placeholder="搜尋曲名...">
+          <label class="text-xs font-bold uppercase tracking-wider text-stayc-neon flex items-center gap-1.5">
+            <span>STAYC 歌曲庫</span>
+            <span class="text-[10px] text-gray-400 font-normal">(依專輯分類)</span>
+          </label>
+          <input type="text" id="song-filter" class="text-xs bg-[#12111d] border border-gray-700/60 rounded-md px-2.5 py-1 text-gray-300 placeholder-gray-500 focus:outline-none focus:border-stayc-pink" placeholder="搜尋任意曲名...">
         </div>
         
-        <!-- 分類標籤 -->
-        <div class="flex gap-1.5 mb-2.5 text-[11px] overflow-x-auto pb-1">
-          <button type="button" class="filter-tab px-2.5 py-1 rounded-md bg-stayc-pink text-white font-semibold" data-category="all">全部</button>
-          <button type="button" class="filter-tab px-2.5 py-1 rounded-md bg-gray-800 text-gray-400 hover:text-white" data-category="title">歷代主打</button>
-          <button type="button" class="filter-tab px-2.5 py-1 rounded-md bg-gray-800 text-gray-400 hover:text-white" data-category="album">正規一輯/新曲</button>
-          <button type="button" class="filter-tab px-2.5 py-1 rounded-md bg-gray-800 text-gray-400 hover:text-white" data-category="unit">小分隊 / Solo</button>
-          <button type="button" class="filter-tab px-2.5 py-1 rounded-md bg-gray-800 text-gray-400 hover:text-white" data-category="bside">經典收錄曲</button>
-          <button type="button" class="filter-tab px-2.5 py-1 rounded-md bg-gray-800 text-gray-400 hover:text-white" data-category="jp">日單 / 翻唱</button>
+        <!-- 專輯切換標籤列 -->
+        <div id="album-tabs" class="flex gap-1.5 mb-2.5 text-[11px] overflow-x-auto pb-1.5 scrollbar-thin">
+          <!-- 由 JS 動態生成專輯標籤 -->
         </div>
 
-        <div id="songs-grid" class="flex flex-wrap gap-1.5 max-h-48 overflow-y-auto pr-1">
-          <!-- 由 JS 自動渲染歌曲清單 -->
+        <!-- 歌曲清單展示區 (依專輯分組) -->
+        <div id="songs-grid" class="space-y-3 max-h-64 overflow-y-auto pr-1">
+          <!-- 由 JS 自動渲染專輯群組與歌曲 -->
         </div>
       </div>
 
@@ -201,81 +200,184 @@
   </div>
 
   <script>
-    // STAYC 歌曲資料庫 (全面收錄歷代主打、正規一輯、小分隊、收錄曲)
-    const STAYC_SONGS = [
-      // 1. 歷代主打歌 (Title Tracks)
-      { name: "SO BAD", category: "title" },
-      { name: "ASAP", category: "title" },
-      { name: "STEREOTYPE (색안경)", category: "title" },
-      { name: "RUN2U", category: "title" },
-      { name: "BEAUTIFUL MONSTER", category: "title" },
-      { name: "Teddy Bear", category: "title" },
-      { name: "Bubble", category: "title" },
-      { name: "Cheeky Icy Thang", category: "title" },
-      { name: "Poppy (Korean Ver.)", category: "title" },
-      { name: "LIT (Korean Ver.)", category: "title" },
-
-      // 2. 小分隊 / Solo 曲目 (Unit & Solo)
-      { name: "Find (Sieun & Seeun & J)", category: "unit" },
-      { name: "Fakin’ ( Sumin & Yoon )", category: "unit" },
-      { name: "Roses ( ISA )", category: "unit" },
-      { name: "Over U, 안녕 (Seeun x J)", category: "unit" },
-
-      // 3. 正規一輯《Metamorphic》及最新曲目
-      { name: "Twenty", category: "album" },
-      { name: "1 Thing", category: "album" },
-      { name: "Give It 2 Me", category: "album" },
-      { name: "Let Me Know", category: "album" },
-      { name: "Nada", category: "album" },
-      { name: "Beauty Bomb", category: "album" },
-      { name: "Gummy Bear", category: "album" },
-      { name: "Stay WITH me", category: "album" },
-      { name: "Flexing On My Ex", category: "album" },
-      { name: "Trouble Maker", category: "album" },
-      { name: "GPT", category: "album" },
-      { name: "너란 별을 만나 (Meant To Be)", category: "album" },
-      { name: "Tell Me Now", category: "album" },
-      { name: "BEBE", category: "album" },
-      { name: "DIAMOND", category: "album" },
-      { name: "PIPE DOWN", category: "album" },
-      { name: "Lover, Killer", category: "album" },
-      { name: "I WANT IT", category: "album" },
-      { name: "BOY", category: "album" },
-      { name: "반칙(Honestly)", category: "album" },
-      { name: "MWUAH", category: "album" },
-      { name: "Satellite", category: "album" },
-      { name: "Say My Name", category: "album" },
-      { name: "2 L0VE", category: "album" },
-      { name: "WHERE YOU AT?", category: "album" },
-      { name: "SORRY", category: "album" },
-      { name: "BEAT MY LOVE", category: "album" },
-      { name: "I LIKE IT", category: "album" },
-      { name: "I Wanna Do", category: "album" },
-
-      // 4. 經典人氣收錄曲 (B-sides)
-      { name: "LIKE THIS", category: "bside" },
-      { name: "SO WHAT", category: "bside" },
-      { name: "LOVE FOOL (사랑은 원래 이렇게 아픈 건가요)", category: "bside" },
-      { name: "COMPLEX", category: "bside" },
-      { name: "I'LL BE THERE", category: "bside" },
-      { name: "SLOW DOWN", category: "bside" },
-      { name: "YOUNG LUV", category: "bside" },
-      { name: "SAME SAME", category: "bside" },
-      { name: "247", category: "bside" },
-      { name: "BUTTERFLY", category: "bside" },
-      { name: "I WANT U BABY", category: "bside" },
-      { name: "LOVE", category: "bside" },
-      { name: "Not Like You", category: "bside" },
-      { name: "Be Mine", category: "bside" },
-
-      // 5. 日文曲 / 其他 (Japanese & Special)
-      { name: "Poppy (Japanese Ver.)", category: "jp" },
-      { name: "LIT", category: "jp" },
-      { name: "MEOW", category: "jp" }
+    // STAYC 依專輯分類歌曲資料庫 (參照 Namu Wiki 音盤結構)
+    const STAYC_ALBUMS = [
+      {
+        id: "2love",
+        short: "2:LOVE",
+        name: "6th Single 《2:LOVE》",
+        year: "2026.06",
+        songs: [
+          { name: "2 L0VE", isTitle: true },
+          { name: "WHERE YOU AT?", isTitle: false },
+          { name: "SORRY", isTitle: false },
+          { name: "BEAT MY LOVE", isTitle: false }
+        ]
+      },
+      {
+        id: "stay_alive",
+        short: "STAY ALIVE",
+        name: "JP 1st Album 《STAY ALIVE》",
+        year: "2026.02",
+        songs: [
+          { name: "MWUAH", isTitle: true },
+          { name: "Satellite", isTitle: false },
+          { name: "Say My Name", isTitle: false },
+          { name: "Tell Me Now", isTitle: false }
+        ]
+      },
+      {
+        id: "i_want_it",
+        short: "I WANT IT",
+        name: "Special Single 《I WANT IT》",
+        year: "2025.07",
+        songs: [
+          { name: "I WANT IT", isTitle: true },
+          { name: "BOY", isTitle: false },
+          { name: "반칙(Honestly)", isTitle: false }
+        ]
+      },
+      {
+        id: "s_album",
+        short: "S",
+        name: "5th Single 《S》",
+        year: "2025.03",
+        songs: [
+          { name: "BEBE", isTitle: true },
+          { name: "DIAMOND", isTitle: false },
+          { name: "PIPE DOWN", isTitle: false }
+        ]
+      },
+      {
+        id: "dot_dot_l",
+        short: "...l",
+        name: "Digital Single 《...l》",
+        year: "2024.10",
+        songs: [
+          { name: "GPT", isTitle: true },
+          { name: "너란 별을 만나 (Meant To Be)", isTitle: false }
+        ]
+      },
+      {
+        id: "metamorphic",
+        short: "Metamorphic",
+        name: "1st Album 《Metamorphic》",
+        year: "2024.07",
+        songs: [
+          { name: "Cheeky Icy Thang", isTitle: true },
+          { name: "Twenty", isTitle: false },
+          { name: "1 Thing", isTitle: false },
+          { name: "Give It 2 Me", isTitle: false },
+          { name: "Find (Sieun & Seeun & J)", isTitle: false, isUnit: true },
+          { name: "Let Me Know", isTitle: false },
+          { name: "Nada", isTitle: false },
+          { name: "Fakin’ ( Sumin & Yoon )", isTitle: false, isUnit: true },
+          { name: "Roses ( ISA )", isTitle: false, isUnit: true },
+          { name: "Beauty Bomb", isTitle: false },
+          { name: "Gummy Bear", isTitle: false },
+          { name: "Stay WITH me", isTitle: false },
+          { name: "Flexing On My Ex", isTitle: false },
+          { name: "Trouble Maker", isTitle: false }
+        ]
+      },
+      {
+        id: "teenfresh",
+        short: "TEENFRESH",
+        name: "3rd Mini Album 《TEENFRESH》",
+        year: "2023.08",
+        songs: [
+          { name: "Bubble", isTitle: true },
+          { name: "Not Like You", isTitle: false },
+          { name: "I Wanna Do", isTitle: false },
+          { name: "Be Mine", isTitle: false }
+        ]
+      },
+      {
+        id: "teddy_bear",
+        short: "Teddy Bear",
+        name: "4th Single 《Teddy Bear》",
+        year: "2023.02",
+        songs: [
+          { name: "Teddy Bear", isTitle: true },
+          { name: "Poppy (Korean Ver.)", isTitle: false }
+        ]
+      },
+      {
+        id: "we_need_love",
+        short: "WE NEED LOVE",
+        name: "3rd Single 《WE NEED LOVE》",
+        year: "2022.07",
+        songs: [
+          { name: "BEAUTIFUL MONSTER", isTitle: true },
+          { name: "I LIKE IT", isTitle: false },
+          { name: "LOVE", isTitle: false }
+        ]
+      },
+      {
+        id: "young_luv",
+        short: "YOUNG-LUV",
+        name: "2nd Mini Album 《YOUNG-LUV.COM》",
+        year: "2022.02",
+        songs: [
+          { name: "RUN2U", isTitle: true },
+          { name: "SAME SAME", isTitle: false },
+          { name: "247", isTitle: false },
+          { name: "YOUNG LUV", isTitle: false },
+          { name: "BUTTERFLY", isTitle: false },
+          { name: "I WANT U BABY", isTitle: false }
+        ]
+      },
+      {
+        id: "stereotype",
+        short: "STEREOTYPE",
+        name: "1st Mini Album 《STEREOTYPE》",
+        year: "2021.09",
+        songs: [
+          { name: "STEREOTYPE (색안경)", isTitle: true },
+          { name: "I'LL BE THERE", isTitle: false },
+          { name: "SLOW DOWN", isTitle: false },
+          { name: "COMPLEX", isTitle: false }
+        ]
+      },
+      {
+        id: "staydom",
+        short: "STAYDOM",
+        name: "2nd Single 《STAYDOM》",
+        year: "2021.04",
+        songs: [
+          { name: "ASAP", isTitle: true },
+          { name: "SO WHAT", isTitle: false },
+          { name: "LOVE FOOL (사랑은 원래 이렇게 아픈 건가요)", isTitle: false }
+        ]
+      },
+      {
+        id: "star_to_young",
+        short: "Star Culture",
+        name: "1st Single 《Star To A Young Culture》",
+        year: "2020.11",
+        songs: [
+          { name: "SO BAD", isTitle: true },
+          { name: "LIKE THIS", isTitle: false }
+        ]
+      },
+      {
+        id: "special_unit",
+        short: "特別企劃 / 日單",
+        name: "Special & JP Singles",
+        year: "Special",
+        songs: [
+          { name: "Over U, 안녕 (Seeun x J)", isTitle: true, isUnit: true },
+          { name: "Lover, Killer", isTitle: true },
+          { name: "Poppy", isTitle: true },
+          { name: "LIT", isTitle: true },
+          { name: "MEOW", isTitle: true }
+        ]
+      }
     ];
 
     // 狀態管理
     let setlist = [];
+    let currentAlbumFilter = 'all';
     const STORAGE_KEY = 'stayc_setlist_data';
     const META_KEY = 'stayc_concert_meta';
 
@@ -283,6 +385,7 @@
     window.addEventListener('DOMContentLoaded', () => {
       loadMeta();
       loadSetlist();
+      renderAlbumTabs();
       renderSongsGrid('all', '');
       setupEventListeners();
     });
@@ -322,46 +425,107 @@
       renderSetlist();
     }
 
-    // 渲染歌曲按鈕庫
-    function renderSongsGrid(category, query) {
+    // 渲染專輯切換標籤列
+    function renderAlbumTabs() {
+      const tabsContainer = document.getElementById('album-tabs');
+      tabsContainer.innerHTML = '';
+
+      // 全部標籤
+      const allBtn = document.createElement('button');
+      allBtn.type = 'button';
+      allBtn.className = 'album-tab-btn px-2.5 py-1 rounded-md bg-stayc-pink text-white font-semibold whitespace-nowrap transition-colors';
+      allBtn.dataset.albumId = 'all';
+      allBtn.textContent = '全部專輯';
+      tabsContainer.appendChild(allBtn);
+
+      // 個別專輯標籤
+      STAYC_ALBUMS.forEach(album => {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'album-tab-btn px-2.5 py-1 rounded-md bg-[#181628] text-gray-400 hover:text-white border border-gray-700/60 whitespace-nowrap transition-colors';
+        btn.dataset.albumId = album.id;
+        btn.textContent = album.short;
+        tabsContainer.appendChild(btn);
+      });
+    }
+
+    // 依專輯分組渲染歌曲
+    function renderSongsGrid(albumFilter, searchQuery) {
       const container = document.getElementById('songs-grid');
       container.innerHTML = '';
 
-      const filtered = STAYC_SONGS.filter(song => {
-        const matchesCategory = category === 'all' || song.category === category;
-        const matchesQuery = song.name.toLowerCase().includes(query.toLowerCase());
-        return matchesCategory && matchesQuery;
-      });
+      const query = (searchQuery || '').trim().toLowerCase();
+      let hasAnyMatch = false;
 
-      if (filtered.length === 0) {
-        container.innerHTML = '<span class="text-xs text-gray-500 py-2">找不到相符歌曲</span>';
-        return;
-      }
+      // 決定要渲染的專輯清單
+      const albumsToRender = albumFilter === 'all' 
+        ? STAYC_ALBUMS 
+        : STAYC_ALBUMS.filter(a => a.id === albumFilter);
 
-      filtered.forEach(song => {
-        const btn = document.createElement('button');
-        btn.type = 'button';
-        btn.className = `btn-press text-xs px-2.5 py-1.5 rounded-lg border transition-all text-left ${
-          song.category === 'title' 
-            ? 'bg-pink-950/40 hover:bg-pink-900/60 border-pink-500/40 text-pink-200 font-semibold' 
-            : song.category === 'unit'
-            ? 'bg-purple-950/50 hover:bg-purple-900/70 border-purple-500/40 text-purple-200 font-medium'
-            : song.category === 'album'
-            ? 'bg-indigo-950/40 hover:bg-indigo-900/60 border-indigo-500/40 text-indigo-200'
-            : song.category === 'jp'
-            ? 'bg-amber-950/30 hover:bg-amber-900/50 border-amber-500/30 text-amber-200'
-            : 'bg-[#181628] hover:bg-[#25223c] border-gray-700/60 text-gray-200'
-        }`;
-        btn.textContent = song.name;
-        btn.addEventListener('click', () => {
-          addItem({
-            type: 'song',
-            title: song.name,
-            note: ''
-          });
+      albumsToRender.forEach(album => {
+        // 過濾歌曲
+        const matchedSongs = album.songs.filter(song => {
+          if (!query) return true;
+          return song.name.toLowerCase().includes(query);
         });
-        container.appendChild(btn);
+
+        if (matchedSongs.length === 0) return;
+        hasAnyMatch = true;
+
+        // 建立專輯分組區塊
+        const groupEl = document.createElement('div');
+        groupEl.className = 'bg-[#12111d]/70 rounded-xl p-2.5 border border-stayc-border/60';
+
+        // 專輯小標題
+        const headerEl = document.createElement('div');
+        headerEl.className = 'flex items-center justify-between text-[11px] mb-2 pb-1 border-b border-gray-800 text-gray-400';
+        headerEl.innerHTML = `
+          <span class="font-bold text-stayc-neon flex items-center gap-1">
+            <span>💿</span> ${album.name}
+          </span>
+          <span class="text-[10px] text-gray-500 font-mono">${album.year}</span>
+        `;
+        groupEl.appendChild(headerEl);
+
+        // 歌曲按鈕容器
+        const songsWrap = document.createElement('div');
+        songsWrap.className = 'flex flex-wrap gap-1.5';
+
+        matchedSongs.forEach(song => {
+          const btn = document.createElement('button');
+          btn.type = 'button';
+          
+          let btnStyle = 'bg-[#181628] hover:bg-[#25223c] border-gray-700/70 text-gray-200';
+          let badge = '';
+
+          if (song.isTitle) {
+            btnStyle = 'bg-pink-950/40 hover:bg-pink-900/60 border-pink-500/50 text-pink-200 font-semibold shadow-sm shadow-pink-500/10';
+            badge = '<span class="text-[9px] px-1 py-0.2 rounded bg-pink-500 text-white font-bold ml-1">TITLE</span>';
+          } else if (song.isUnit) {
+            btnStyle = 'bg-purple-950/40 hover:bg-purple-900/60 border-purple-500/50 text-purple-200 font-medium';
+            badge = '<span class="text-[9px] px-1 py-0.2 rounded bg-purple-600 text-white font-bold ml-1">UNIT</span>';
+          }
+
+          btn.className = `btn-press text-xs px-2.5 py-1.5 rounded-lg border transition-all text-left flex items-center ${btnStyle}`;
+          btn.innerHTML = `<span>${song.name}</span>${badge}`;
+          
+          btn.addEventListener('click', () => {
+            addItem({
+              type: 'song',
+              title: song.name,
+              note: ''
+            });
+          });
+          songsWrap.appendChild(btn);
+        });
+
+        groupEl.appendChild(songsWrap);
+        container.appendChild(groupEl);
       });
+
+      if (!hasAnyMatch) {
+        container.innerHTML = '<div class="text-xs text-gray-500 py-4 text-center">找不到相符的歌曲</div>';
+      }
     }
 
     // 新增項目 (無時間戳記)
@@ -483,23 +647,24 @@
         });
       });
 
-      // 搜尋曲庫
-      let currentCategory = 'all';
+      // 搜尋曲庫 (即時跨專輯比對)
       const searchInput = document.getElementById('song-filter');
       searchInput.addEventListener('input', (e) => {
-        renderSongsGrid(currentCategory, e.target.value);
+        renderSongsGrid(currentAlbumFilter, e.target.value);
       });
 
-      // 分類標籤切換
-      document.querySelectorAll('.filter-tab').forEach(tab => {
-        tab.addEventListener('click', () => {
-          document.querySelectorAll('.filter-tab').forEach(t => {
-            t.className = 'filter-tab px-2.5 py-1 rounded-md bg-gray-800 text-gray-400 hover:text-white';
-          });
-          tab.className = 'filter-tab px-2.5 py-1 rounded-md bg-stayc-pink text-white font-semibold';
-          currentCategory = tab.dataset.category;
-          renderSongsGrid(currentCategory, searchInput.value);
+      // 專輯標籤切換
+      const albumTabsContainer = document.getElementById('album-tabs');
+      albumTabsContainer.addEventListener('click', (e) => {
+        const btn = e.target.closest('.album-tab-btn');
+        if (!btn) return;
+
+        document.querySelectorAll('.album-tab-btn').forEach(b => {
+          b.className = 'album-tab-btn px-2.5 py-1 rounded-md bg-[#181628] text-gray-400 hover:text-white border border-gray-700/60 whitespace-nowrap transition-colors';
         });
+        btn.className = 'album-tab-btn px-2.5 py-1 rounded-md bg-stayc-pink text-white font-semibold whitespace-nowrap transition-colors';
+        currentAlbumFilter = btn.dataset.albumId;
+        renderSongsGrid(currentAlbumFilter, searchInput.value);
       });
 
       // 列表委派事件 (排序 / 刪除 / 編輯備註)
