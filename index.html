@@ -437,10 +437,11 @@
       },
       {
         id: "fanconcert_solo",
-        short: "Fanconcert Solo",
-        name: "🎤 Fanconcert 成員 Solo / Cover 舞台",
-        year: "Solo Stages",
+        short: "Fanconcert 舞台",
+        name: "🎤 Fanconcert 首爾場特別舞台 / 組曲 / Solo",
+        year: "Concert Special",
         songs: [
+          { name: "RUN2U / POPPY (korean ver.) / Cheeky Icy Thang / GPT / BEBE / STEREOTYPE / ASAP", isTitle: true, isMedley: true },
           { name: "ISA - Bo peep Bo peep (T-ARA)", isSolo: true },
           { name: "Sumin - Bubble Pop! (HyunA)", isSolo: true },
           { name: "Sumin - I Really Like You (Carly Rae Jepsen)", isSolo: true },
@@ -680,7 +681,10 @@
         const chips = matched.map(song => {
           let style = 'bg-[#181628] border-gray-700/70 text-gray-200';
           let badge = '';
-          if (song.isTitle) {
+          if (song.isMedley) {
+            style = 'bg-gradient-to-r from-pink-950/60 to-purple-950/60 border-pink-500/60 text-pink-200 font-semibold shadow-sm shadow-pink-500/20';
+            badge = '<span class="shrink-0 text-[9px] px-1 py-px rounded bg-gradient-to-r from-pink-500 to-purple-600 text-white font-bold">MEDLEY</span>';
+          } else if (song.isTitle) {
             style = 'bg-pink-950/40 border-pink-500/50 text-pink-200 font-semibold';
             badge = '<span class="shrink-0 text-[9px] px-1 py-px rounded bg-pink-500 text-white font-bold">TITLE</span>';
           } else if (song.isSolo) {
