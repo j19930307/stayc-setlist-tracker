@@ -206,12 +206,12 @@
       </summary>
       <div class="px-4 pb-4 space-y-3">
         <div>
-          <label for="concert-title" class="block text-xs font-medium text-gray-400 mb-1">演出名稱</label>
-          <input type="text" id="concert-title" enterkeyhint="next" class="w-full h-12 bg-[#12111d] border border-gray-700/60 rounded-xl px-3 font-semibold text-white focus:outline-none focus:border-stayc-neon" placeholder="STAYC Concert Tour">
+          <label for="concert-title" class="block text-xs font-medium text-gray-400 mb-1">場次名稱</label>
+          <input type="text" id="concert-title" enterkeyhint="next" class="w-full h-12 bg-[#12111d] border border-gray-700/60 rounded-xl px-3 font-semibold text-white focus:outline-none focus:border-stayc-neon" placeholder="2026 STAYC FAN CONCERT TOUR [STAY CLOSER] IN TAIPEI">
         </div>
         <div>
-          <label for="concert-meta" class="block text-xs font-medium text-gray-400 mb-1">日期與地點</label>
-          <input type="text" id="concert-meta" enterkeyhint="done" class="w-full h-12 bg-[#12111d] border border-gray-700/60 rounded-xl px-3 text-gray-300 focus:outline-none focus:border-stayc-neon" placeholder="2026.10.11 @ Arena">
+          <label for="concert-meta" class="block text-xs font-medium text-gray-400 mb-1">演出日期（選填）</label>
+          <input type="text" id="concert-meta" enterkeyhint="done" class="w-full h-12 bg-[#12111d] border border-gray-700/60 rounded-xl px-3 text-gray-300 focus:outline-none focus:border-stayc-neon" placeholder="2026.10.11">
         </div>
       </div>
     </details>
@@ -511,8 +511,10 @@
     function loadMeta() {
       let meta = {};
       try { meta = JSON.parse(safeGet(META_KEY) || '{}'); } catch (e) { meta = {}; }
-      $('concert-title').value = meta.title || 'STAYC CONCERT TOUR';
-      $('concert-meta').value = meta.meta || '2026.10.11 @ Live Stage';
+      const defaultTitle = '2026 STAYC FAN CONCERT TOUR [STAY CLOSER] IN TAIPEI';
+      const defaultMeta = '2026.10.11';
+      $('concert-title').value = (!meta.title || meta.title === 'STAYC CONCERT TOUR') ? defaultTitle : meta.title;
+      $('concert-meta').value = (!meta.meta || meta.meta.includes('Live Stage') || meta.meta.includes('Arena')) ? defaultMeta : meta.meta;
       updateInfoSummary();
     }
 
@@ -928,7 +930,7 @@
       const meta = $('concert-meta').value.trim();
 
       let text = `💖 ${title} 💖\n`;
-      if (meta) text += `📍 ${meta}\n`;
+      if (meta) text += `📅 ${meta}\n`;
       text += `──────────────\n`;
 
       let songNo = 1;
